@@ -26,3 +26,6 @@ faiss_index/
 .idea/
 .DS_Store
 Thumbs.db
+
+#  chroma local DB
+.chroma_db
