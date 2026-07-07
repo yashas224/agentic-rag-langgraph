@@ -13,27 +13,37 @@ vectorstore = Chroma(
     embedding_function=embeddings,
     collection_name="index-rag-chroma",
 )
-
+load_dotenv()
 urls = [
     "https://lilianweng.github.io/posts/2023-06-23-agent/",
     "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
     "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
 ]
 
-load_dotenv()
+def loadDocuments():
+    #  load documents
+    docs: list[list[Document]] = [WebBaseLoader(url).load() for url in urls]
+    return docs
 
-#  load documents
-docs: list[list[Document]] = [WebBaseLoader(url).load() for url in urls]
 
-# split
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
-doc_list = [item for doc in docs for item in doc]
+def chunkAndSplitDocuments(docs):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
+    doc_list = [item for doc in docs for item in doc]
 
-docs_split = text_splitter.split_documents(documents=doc_list)
-print(f"initial documents : {len(doc_list)} Final Chunks {len(docs_split)}")
+    docs_split = text_splitter.split_documents(documents=doc_list)
+    print(f"initial documents : {len(doc_list)} Final Chunks {len(docs_split)}")
+    return docs_split
 
-#  Vectore Store Ingestion
+    #  Vectore Store Ingestion
 
-vectorstore.from_documents(documents=docs_split)
+def ingestIntoVectoreStore(docs_split):
+    vectorstore.from_documents(documents=docs_split)
 
-retriver = vectorstore.as_retriever()
+
+docs=loadDocuments()
+docs_split=chunkAndSplitDocuments(docs)
+ingestIntoVectoreStore(docs_split)
+
+
+def getVectoreStoreRetriever():
+    return vectorstore.as_retriever()
