@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import WebBaseLoader
@@ -20,6 +22,7 @@ urls = [
     "https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/",
 ]
 
+
 def loadDocuments():
     #  load documents
     docs: list[list[Document]] = [WebBaseLoader(url).load() for url in urls]
@@ -27,7 +30,7 @@ def loadDocuments():
 
 
 def chunkAndSplitDocuments(docs):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
     doc_list = [item for doc in docs for item in doc]
 
     docs_split = text_splitter.split_documents(documents=doc_list)
@@ -36,14 +39,25 @@ def chunkAndSplitDocuments(docs):
 
     #  Vectore Store Ingestion
 
+
 def ingestIntoVectoreStore(docs_split):
-    vectorstore.from_documents(documents=docs_split)
-
-
-docs=loadDocuments()
-docs_split=chunkAndSplitDocuments(docs)
-ingestIntoVectoreStore(docs_split)
+    vectorstore = Chroma.from_documents(
+        documents=docs_split,
+        collection_name="index-rag-chroma",
+        embedding=OpenAIEmbeddings(),
+        persist_directory="./.chroma_db",
+    )
 
 
 def getVectoreStoreRetriever():
-    return vectorstore.as_retriever()
+    return Chroma(
+        collection_name="index-rag-chroma",
+        persist_directory="./.chroma_db",
+        embedding_function=OpenAIEmbeddings(),
+    ).as_retriever()
+
+
+if __name__ == "__main__":
+    docs = loadDocuments()
+    docs_split = chunkAndSplitDocuments(docs)
+    ingestIntoVectoreStore(docs_split)
