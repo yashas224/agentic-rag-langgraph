@@ -22,7 +22,7 @@ def gradeDocNode(state: GraphState):
         response: GradeDocument = retrieval_grader.invoke(
             {"question": question, "document": d.page_content}
         )
-        if response.isRelevant == 'yes':
+        if response.isRelevant == "yes":
             print("---GRADE: DOCUMENT RELEVANT---")
             filtered_docs.append(d)
         else:
