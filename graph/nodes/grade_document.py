@@ -1,9 +1,9 @@
 from typing import Any, Dict
 
 from langchain_core.documents import Document
-from state import GraphState
 
 from graph.chains.retrieval_grader import GradeDocument, retrieval_grader
+from graph.state import GraphState
 
 
 def gradeDocNode(state: GraphState):
@@ -15,22 +15,19 @@ def gradeDocNode(state: GraphState):
     print("---CHECK DOCUMENT RELEVANCE TO QUESTION---")
     docs = state.get("documents")
     question = state.get("question")
-    filtered_docs=[]
-    web_search:bool =False
+    filtered_docs = []
+    web_search: bool = False
 
     for d in docs:
-        response: GradeDocument = retrieval_grader.invoke({"question": question, "document": d.page_content})
-        if(response.isRelevant):
+        response: GradeDocument = retrieval_grader.invoke(
+            {"question": question, "document": d.page_content}
+        )
+        if response.isRelevant == 'yes':
             print("---GRADE: DOCUMENT RELEVANT---")
-            filtered_docs.append(d.page_content)
+            filtered_docs.append(d)
         else:
             print(f"---GRADE: DOCUMENT NOT RELEVANT--- Reason \n{response.reason}")
             web_search = True
             continue
 
-    return {"documents":filtered_docs , "web_search":web_search}
-
-
-
-
- 
+    return {"documents": filtered_docs, "web_search": web_search}

@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
 from langchain_core.documents import Document
-from state import GraphState
 
+from graph.state import GraphState
 from ingestion import getVectoreStoreRetriever
 
 
