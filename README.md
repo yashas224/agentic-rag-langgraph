@@ -1,12 +1,6 @@
 
 
-# Agentic RAG with LangGraph: Graph Logic Explained
-
-## Agent Flow
-![](graph.png)
-
-
-## What this graph does
+# Agentic RAG with LangGraph
 
 This project implements an adaptive Retrieval-Augmented Generation flow using LangGraph.
 
@@ -21,8 +15,32 @@ The goal is to improve answer quality by combining:
 - Local knowledge from Chroma vector store
 - External knowledge from Tavily web search
 - LLM-based graders for relevance and grounding checks
+---
+
+## Agent Flow
+![](graph.png)
+
+## Ingestion
+
+The ingestion pipeline collects content from three source articles, splits the text into chunks, generates embeddings, and stores them in Chroma for retrieval during RAG.
+
+#### Source articles
+- [LLM Powered Autonomous Agents](https://lilianweng.github.io/posts/2023-06-23-agent/)
+- [Prompt Engineering](https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/)
+- [Adversarial Attacks on LLMs](https://lilianweng.github.io/posts/2023-10-25-adv-attack-llm/)
+
+#### What happens in ingestion
+1. Load web documents from the URLs above.
+2. Split documents into 500-character chunks (no overlap).
+3. Create embeddings using OpenAI embeddings.
+4. Persist vectors to Chroma:
+   - Collection: index-rag-chroma
+   - Storage path: .chroma_db
 
 ---
+
+## Retrieval
+
 
 ## Core graph state
 
