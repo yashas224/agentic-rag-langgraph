@@ -1,8 +1,8 @@
 from langgraph.graph import END, START, StateGraph
 
 from graph.chains import answer_grader, hallucination_grader
-from graph.consts import GENERATE, GRADE_DOCUMENTS, RETRIEVE, WEBSEARCH
-from graph.nodes import generate, grade_document, retrieve, web_search
+from graph.consts import DECISION, GENERATE, GRADE_DOCUMENTS, RETRIEVE, WEBSEARCH
+from graph.nodes import decider_node, generate, grade_document, retrieve, web_search
 from graph.state import GraphState
 
 print("Building a LangGraph Graph ")
@@ -12,8 +12,23 @@ builder.add_node(GRADE_DOCUMENTS, grade_document.gradeDocNode)
 builder.add_node(WEBSEARCH, web_search.webSearchNode)
 builder.add_node(GENERATE, generate.generate_node)
 builder.add_node(RETRIEVE, retrieve.retrieveNode)
+builder.add_node(DECISION, decider_node.decider_node)
 
-builder.set_entry_point(RETRIEVE)
+
+builder.set_entry_point(DECISION)
+
+
+def entry_point_condition(state: GraphState):
+
+    if state["initialDecision"] == "vectorstore-search":
+        return "RAG flow"
+    return "Search WEB"
+
+
+builder.add_conditional_edges(
+    DECISION, entry_point_condition, {"RAG flow": RETRIEVE, "Search WEB": WEBSEARCH}
+)
+
 builder.add_edge(RETRIEVE, GRADE_DOCUMENTS)
 
 

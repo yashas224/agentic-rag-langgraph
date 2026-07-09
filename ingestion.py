@@ -15,6 +15,12 @@ vectorstore = Chroma(
     embedding_function=embeddings,
     collection_name="index-rag-chroma",
 )
+
+
+def getVectoreStore():
+    return vectorstore
+
+
 load_dotenv()
 urls = [
     "https://lilianweng.github.io/posts/2023-06-23-agent/",
